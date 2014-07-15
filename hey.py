@@ -420,7 +420,6 @@ class DNDListView(Widget, ListViewAdapter):
                     container.add_widget(item_view)
                     available_height -= item_view.height
                     real_height += item_view.height
-            #self.count = count
 
         self._sizes.update(d)
 
@@ -444,6 +443,8 @@ class Viewer(Screen):
 class TestApp(App):
     blue = ListProperty((0.0, 0.824, 1.0, 1.0))
     white = ListProperty((1.0, 1.0, 1.0, 1.0))
+    gray = ListProperty((0.102, 0.102, 0.102, 1.0))
+    purple = ListProperty((0.4, 0.35, 0.647, 1.0))
 
     def build(self):
         app = Viewer()
@@ -489,6 +490,12 @@ Builder.load_string("""
 <Item>:
     text_size: self.size[0]-(0.1*self.size[0]), None
     font_size: 28
+    canvas.before:
+        Color:
+            rgba: app.gray
+        Rectangle:
+            size: self.size
+            pos: self.pos
 
 <MyWidget>:
     button: button_id
