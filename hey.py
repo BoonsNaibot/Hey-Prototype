@@ -5,15 +5,17 @@ from kivy.modules import inspector
 from kivy.core.window import Window
 #import cProfile
 
-from weakref import ref
+from weakref import ref, proxy
 from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.layout import Layout
 from kivy.properties import WeakListProperty
 from kivy.weakreflist import WeakList
+from scroller import Scroller
 from kivy.properties import OptionProperty, DictProperty, BooleanProperty, ObjectProperty, StringProperty, NumericProperty, ListProperty
 from kivy.clock import Clock
+from math import ceil, floor
 
 class ListViewAdapter(object):
     data = ListProperty([])
@@ -200,6 +202,9 @@ class MyButton(Button_):
     def on_release(self):
         self.parent.state = 'set'
 
+class Item(Label):
+    pass
+
 class MyWidget(Widget):
     button = ObjectProperty(None)
     state = OptionProperty('ready', options=('ready', 'set', 'go'))
@@ -242,7 +247,7 @@ class MyWidget(Widget):
 
             def _on_start(a, w):
                 for x in self.children[:]:
-                    if x is not w:
+                    if x is not w.__self__:
                         _anim = Animation(opacity=0, t='out_expo', duration=0.4)
                         _anim.bind(on_complete=remove_widget)
                         x._anim = ref(_anim)
@@ -265,9 +270,14 @@ class MyWidget(Widget):
             anim.start(popup)"""
             print 'helga'
 
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            return super(MyWidget, self).on_touch_down(touch)
+
 class ListContainerLayout(Layout):
     spacing = NumericProperty(0)
     padding = NumericProperty(0)
+    widget = ObjectProperty(None)
     children = WeakListProperty(WeakList())
 
     def __init__(self, **kwargs):
@@ -284,12 +294,19 @@ class ListContainerLayout(Layout):
             w, h = self.size
             spacing = self.spacing
             place = (y + h) - self.padding
+            widget = self.widget
+            widget.parent.state = 'ready'
+            widget.text = ''
+            widget_y = widget.y
 
             for c in reversed(self.children[:]):
                 c.width = w
                 c.x = x
                 c.top = place
                 place -= (c.height + spacing)
+
+                if widget_y <= c.center_y:
+                    widget.text = c.text
 
 class DNDListView(Widget, ListViewAdapter):
     container = ObjectProperty(None)
@@ -303,15 +320,10 @@ class DNDListView(Widget, ListViewAdapter):
     placeholder = ObjectProperty(None, allownone=True)
 
     def __init__(self, **kwargs):
-        self.register_event_type("on_motion_over")
-        self.register_event_type("on_motion_out")
-        self.register_event_type("on_drag")
         self._trigger_populate = Clock.create_trigger(self._do_layout, -1)
-        #self._trigger_reset_populate = Clock.create_trigger(self._reset_spopulate, -1)
         super(DNDListView, self).__init__(**kwargs)
         self.bind(pos=self._trigger_populate,
-                  size=self._trigger_populate)#,
-                  #data=self._trigger_reset_populate)
+                  size=self._trigger_populate)
 
     def on_data(self, instance, value):
         super(DNDListView, self).on_data(instance, value)
@@ -348,9 +360,6 @@ class DNDListView(Widget, ListViewAdapter):
     def _do_layout(self, *args):
         self._sizes.clear()
         self.populate()
-        #children = self.container.children
-        #t = ((c.index, c.height) for c in children)
-        #self._sizes.update(t)
 
     def on__sizes(self, instance, value):
         if value:
@@ -358,20 +367,7 @@ class DNDListView(Widget, ListViewAdapter):
             instance.row_height = rh = next(value.itervalues(), 0) #since they're all the same
             container.height = ((rh + instance.spacing) * instance.get_count()) + (self.height - rh)
 
-    """def _reset_spopulate(self, *args):
-        self._sizes.clear()
-        self._wend = -1
-        self.populate()
-        # simulate the scroll again, only if we already scrolled before
-        # the position might not be the same, mostly because we don't know the
-        # size of the new item.
-        if hasattr(self, '_scroll_y'):
-            self._scroll(self._scroll_y)"""
-
     def populate(self, istart=None, iend=None):
-        #print istart, iend
-        #istart = istart or self._wstart
-        #iend = iend or self._wend
         container = self.container
         get_view = self.get_view
         rh = self.row_height
@@ -429,7 +425,21 @@ class DNDListView(Widget, ListViewAdapter):
         self._sizes.update(d)
 
 class Viewer(Screen):
-    pass
+    _item = ObjectProperty(proxy(Item))
+    data = ListProperty(['Amanda Hugginkiss',
+                         'Ivana Tinkle',
+                         'Hugh Jass',
+                         'Anita Bath',
+                         'Maya Buttreeks',
+                         'I.P. Freely',
+                         'Al Coholic',
+                         'Seymour Butts',
+                         'Homer Sexual',
+                         'Mike Rotch'])
+
+    def _args_converter(self, row_index, an_obj):
+        return {'text': an_obj,
+                'size_hint_y': None}
 
 class TestApp(App):
     blue = ListProperty((0.0, 0.824, 1.0, 1.0))
@@ -471,14 +481,43 @@ Builder.load_string("""
 <Button_>:
     state_color: app.white if self.state=='down' else app.blue
     text_color: app.white
+    font_size: self.height*0.3
+
+<MyButton>:
     font_size: self.height*0.421875
 
+<Item>:
+    text_size: self.size[0]-(0.1*self.size[0]), None
+    font_size: 28
+
+<MyWidget>:
+    button: button_id
+    size_hint: 0.5, 0.5
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    canvas:
+        Color:
+            rgb: app.blue
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    MyButton:
+        id: button_id
+        text: 'Truth'
+        size: root.size[0], 0.5*root.size[1]
+        pos: root.pos
+        aleft: True
+        
 <DNDListView>:
     container: container_id
 
+    MyWidget:
+        id: widget_id
+        size: root.size[0], (1.0/3)*root.size[1]
+        top: root.top
+        x: root.x
     Scroller:
         pos: root.pos
-        size: root.size
+        size: root.size[0], (2.0/3)*root.size[1]
         on_scroll_y: root._scroll(args[1])
 
         ListContainerLayout:
@@ -486,26 +525,32 @@ Builder.load_string("""
             x: root.x
             width: root.width
             spacing: root.spacing
+            widget: widget_id.button
 
 <Viewer>:
     name: 'My Screen'
+    list_view: list_view_id
 
-    MyWidget:
-        id: my_widget
-        button: button_id
-        size_hint: 0.5, 0.5
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
-        canvas:
+    Widget:
+        size_hint: 1, 0.1127
+        pos_hint:{'top': 1, 'x': 0}
+        canvas.before:
             Color:
-                rgb: app.blue
+                rgba: app.blue
             Rectangle:
-                pos: self.pos
                 size: self.size
-        MyButton:
-            id: button_id
-            text: 'Truth'
-            size: my_widget.size[0], 0.5*my_widget.size[1]
-            pos: my_widget.pos
+                pos: self.pos
+
+    DNDListView:
+        id: list_view_id
+        selection_mode: 'None'
+        list_item: root._item
+        args_converter: root._args_converter
+        size_hint: 1, .8
+        pos_hint: {'top': 0.8873}
+        data: root.data
+
+
 """)
 
 if __name__ == '__main__':
