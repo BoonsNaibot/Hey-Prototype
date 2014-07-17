@@ -197,13 +197,25 @@ class Button_(Clickable):
         else:
             return super(Button_, self).on_touch_down(touch)
 
+    def on_release(self):
+        self.parent.state = 'go'
+
 class MyButton(Button_):
+
+    def on_touch_down(self, touch):
+        if self.text:
+            return super(MyButton, self).on_touch_down(touch)
 
     def on_release(self):
         self.parent.state = 'set'
 
 class Item(Label):
     pass
+
+class MyPopup(Widget):
+
+    def on_touch_down(self, *args):
+        return False
 
 class MyWidget(Widget):
     button = ObjectProperty(None)
@@ -259,16 +271,20 @@ class MyWidget(Widget):
             anim.start(self.button)
 
         elif state == 'go':
-            """remove_widget = lambda a, w: self.get_parent_window().remove_widget(w)
-            popup = Popup(pos_hint={'center_x': 0.5, 'center_y': 0.5},
-                          size_hint=(0.45, 0.45))
-            self.get_parent_window().add_widget(popup)
-            anim = Animation(opacity=0, t='out_expo', duration=0.4)
-            anim.bind(on_complete=remove_widget)
-            for x in self.children[:]:
-                x._anim = ref(anim)
-            anim.start(popup)"""
-            print 'helga'
+            viewer = self.parent.parent
+
+            def _on_start(a, w):
+                for x in self.children[:]:
+                    x._anim = ref(a)
+                viewer.add_widget(w)
+            
+            def _on_complete(a, w):
+                viewer.remove_widget(w)
+                self.state = 'set'
+
+            anim = Animation(opacity=0, duration=2.0)
+            anim.bind(on_start=_on_start, on_complete=_on_complete)
+            anim.start(MyPopup())
 
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
@@ -441,6 +457,7 @@ class Viewer(Screen):
                 'size_hint_y': None}
 
 class TestApp(App):
+    black = ListProperty((0.0, 0.0, 0.0, 1.0))
     blue = ListProperty((0.0, 0.824, 1.0, 1.0))
     white = ListProperty((1.0, 1.0, 1.0, 1.0))
     gray = ListProperty((0.102, 0.102, 0.102, 1.0))
@@ -496,6 +513,18 @@ Builder.load_string("""
         Rectangle:
             size: self.size
             pos: self.pos
+
+<MyPopup>:
+    opacity: 0.5
+    size_hint: 0.45, 0.45
+    pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+    canvas.before:
+        Color:
+            rgba: app.black
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    
 
 <MyWidget>:
     button: button_id
