@@ -7,10 +7,9 @@ from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.layout import Layout
-from kivy.properties import WeakListProperty
 from kivy.weakreflist import WeakList
 from scroller import Scroller
-from kivy.properties import OptionProperty, DictProperty, BooleanProperty, ObjectProperty, StringProperty, NumericProperty, ListProperty
+from kivy.properties import OptionProperty, DictProperty, BooleanProperty, ObjectProperty, StringProperty, NumericProperty, ListProperty, WeakListProperty
 from kivy.clock import Clock
 from math import ceil, floor
 
