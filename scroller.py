@@ -1,7 +1,7 @@
 from weakref import ref
 from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.uix.stencilview import StencilLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.effects.dampedscroll import DampedScrollEffect
 from kivy.properties import AliasProperty, ListProperty, NumericProperty, ObjectProperty, OptionProperty
 
@@ -46,6 +46,9 @@ class ScrollerEffect(DampedScrollEffect):
         self.is_manual = False
         self.velocity = 0
         self._parent.mode = 'normal'
+
+class StencilLayout(FloatLayout):
+    pass
 
 class Scroller(StencilLayout):
     scroll_distance = NumericProperty('10dp')
@@ -171,6 +174,20 @@ class Scroller(StencilLayout):
             self._viewport = lambda : None
 
 Builder.load_string("""
+<StencilLayout>:
+    canvas.before:
+        StencilPush
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        StencilUse
+    canvas.after:
+        StencilUnUse
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        StencilPop
+
 <Scroller>:
     canvas.after:
         Color:
