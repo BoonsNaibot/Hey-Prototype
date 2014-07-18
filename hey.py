@@ -1,9 +1,6 @@
 from kivy.uix.screenmanager import Screen
 from kivy.lang import Builder
 from kivy.app import App
-from kivy.modules import inspector
-from kivy.core.window import Window
-#import cProfile
 
 from weakref import ref, proxy
 from kivy.animation import Animation
