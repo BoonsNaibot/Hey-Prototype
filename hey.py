@@ -7,7 +7,6 @@ from kivy.animation import Animation
 from kivy.uix.widget import Widget
 from kivy.uix.label import Label
 from kivy.uix.layout import Layout
-from kivy.weakreflist import WeakList
 from scroller import Scroller
 from kivy.properties import OptionProperty, DictProperty, BooleanProperty, ObjectProperty, StringProperty, NumericProperty, ListProperty, WeakListProperty
 from kivy.clock import Clock
@@ -17,7 +16,7 @@ class ListViewAdapter(object):
     data = ListProperty([])
     cached_views = DictProperty({})
     list_item = ObjectProperty(None)
-    selection = WeakListProperty(WeakList())
+    selection = WeakListProperty([])
     args_converter = ObjectProperty(None)
     selection_mode = OptionProperty('single', options=('None', 'single'))
 
@@ -304,7 +303,7 @@ class ListContainerLayout(Layout):
     spacing = NumericProperty(0)
     padding = NumericProperty(0)
     widget = ObjectProperty(None)
-    children = WeakListProperty(WeakList())
+    children = WeakListProperty([])
 
     def __init__(self, **kwargs):
         super(ListContainerLayout, self).__init__(**kwargs)
