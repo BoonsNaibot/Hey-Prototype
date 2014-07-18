@@ -100,6 +100,7 @@ class ButtonRoot(Widget):
     font_size = NumericProperty(0)
     markup = BooleanProperty(False)
     shorten = BooleanProperty(False)
+    font_name = StringProperty('Walkway Bold.ttf')
     state_color = ListProperty([1.0, 1.0, 1.0, 0.0])
     text_color = ListProperty([0.0, 0.824, 1.0, 1.0])
 
@@ -201,6 +202,7 @@ class Button_(Clickable):
         self.parent.state = 'go'
 
 class MyButton(Button_):
+    font_name = StringProperty('oswald.bold.ttf')
 
     def on_touch_down(self, touch):
         if self.text:
@@ -231,20 +233,32 @@ class MyWidget(Widget):
 
             def _on_start1(a, w):
                 self.add_widget(hey)
-                anim1 = Animation(opacity=1, pos=self.pos, t='out_expo', duration=0.4)
+                anim1 = Animation(opacity=1,
+                                  center_x=(self.width/6.0),
+                                  y=self.y,
+                                  t='out_expo',
+                                  duration=0.4)
                 anim1.bind(on_start=_on_start2)
                 hey._anim = ref(anim1)
                 anim1.start(hey)
 
             def _on_start2(a, fw):
                 self.add_widget(heyy)
-                anim2 = Animation(opacity=1, center_x=self.center_x, t='out_expo', duration=0.4)
+                anim2 = Animation(opacity=1,
+                                  center_x=self.center_x,
+                                  y=self.y,
+                                  t='out_expo',
+                                  duration=0.4)
                 anim2.bind(on_start=_on_start3)
                 heyy._anim = ref(anim2)
                 anim2.start(heyy)
                 
             def _on_start3(a, w):
-                anim3 = Animation(opacity=1, right=self.right, y=self.y, t='out_expo', duration=0.4)
+                anim3 = Animation(opacity=1,
+                                  center_x=(self.width*(5.0/6)),
+                                  y=self.y,
+                                  t='out_expo',
+                                  duration=0.4)
                 anim3.bind(on_start=add_widget)
                 hey._anim = ref(anim3)
                 anim3.start(heyyy)
@@ -458,10 +472,11 @@ class Viewer(Screen):
 
 class TestApp(App):
     black = ListProperty((0.0, 0.0, 0.0, 1.0))
-    blue = ListProperty((0.0, 0.824, 1.0, 1.0))
+    green = ListProperty((0.365, 0.7333, 0.632, 1.0))
     white = ListProperty((1.0, 1.0, 1.0, 1.0))
     gray = ListProperty((0.102, 0.102, 0.102, 1.0))
     purple = ListProperty((0.4, 0.35, 0.647, 1.0))
+    yellow = ListProperty((0.56, 0.588, 0.082, 1.0))
 
     def build(self):
         app = Viewer()
@@ -490,6 +505,7 @@ Builder.load_string("""
             size_hint: 1, 1
             pos_hint: {'x': 0, 'y': 0}
             font_size: root.font_size
+            font_name: root.font_name
             shorten: root.shorten
             color: root.text_color
             markup: root.markup
@@ -497,8 +513,8 @@ Builder.load_string("""
             text_size: (self.size[0]-(0.1*self.size[0]), None) if root.aleft else (None, None)
 
 <Button_>:
-    state_color: app.white if self.state=='down' else app.blue
-    text_color: app.white
+    state_color: app.purple
+    text_color: app.yellow if self.state=='down' else app.white
     font_size: self.height*0.3
 
 <MyButton>:
@@ -506,6 +522,7 @@ Builder.load_string("""
 
 <Item>:
     text_size: self.size[0]-(0.1*self.size[0]), None
+    font_name: 'Walkway Bold.ttf'
     font_size: 28
     canvas.before:
         Color:
@@ -516,7 +533,8 @@ Builder.load_string("""
 
 <MyPopup>:
     opacity: 0.5
-    size_hint: 0.45, 0.45
+    size_hint: 0.45, None
+    height: self.width
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
     canvas.before:
         Color:
@@ -524,7 +542,20 @@ Builder.load_string("""
         Rectangle:
             size: self.size
             pos: self.pos
-    
+
+    Label:
+        text: 'O'
+        font_size: root.height*0.7
+        font_name: 'heydings_icons.ttf'
+        center_x: root.center_x
+        top: root.top
+    Label:
+        text: 'Sent'
+        y: root.y
+        center_x: root.center_x
+        font_size: root.height*0.45
+        font_name: 'Walkway Bold.ttf'
+        
 
 <MyWidget>:
     button: button_id
@@ -532,7 +563,7 @@ Builder.load_string("""
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
     canvas:
         Color:
-            rgb: app.blue
+            rgb: app.purple
         Rectangle:
             pos: self.pos
             size: self.size
@@ -572,7 +603,7 @@ Builder.load_string("""
         pos_hint:{'top': 1, 'x': 0}
         canvas.before:
             Color:
-                rgba: app.blue
+                rgba: app.purple
             Rectangle:
                 size: self.size
                 pos: self.pos
@@ -585,6 +616,21 @@ Builder.load_string("""
         size_hint: 1, .8
         pos_hint: {'top': 0.8873}
         data: root.data
+    Label:
+        pos_hint: {'center_x': 0.3, 'y': 0}
+        font_name: 'heydings_icons.ttf'
+        font_size: self.height*0.7
+        size_hint: 0.0625, 0.086
+        color: app.white
+        opacity: 0.5
+        text: 'y'
+    Label:
+        pos_hint: {'center_x': 0.667, 'y': 0}
+        font_name: 'heydings_icons.ttf'
+        font_size: self.height*0.7
+        size_hint: 0.0625, 0.086
+        color: app.green
+        text: 'A'
 
 
 """)
