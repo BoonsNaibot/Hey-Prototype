@@ -475,7 +475,6 @@ class TestApp(App):
 
     def build(self):
         app = Viewer()
-        inspector.create_inspector(Window, app)
         return app
 
 Builder.load_string("""
