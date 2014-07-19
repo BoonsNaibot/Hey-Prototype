@@ -221,9 +221,9 @@ class MyWidget(Widget):
     def on_state(self, instance, state):
         if ((state == 'set') and (len(self.children) == 1)):
             _pos = self.right, self.y
-            hey = Button_(text='Hey', opacity=0, pos=_pos)
-            heyy = Button_(text='Heyy', opacity=0, pos=_pos)
-            heyyy = Button_(text='Heyyy', opacity=0, pos=_pos)
+            hey = Button_(text='Hey', font_name='oswald.bold.ttf', opacity=0, pos=_pos)
+            heyy = Button_(text='Heyy', font_name='oswald.bold.ttf', opacity=0, pos=_pos)
+            heyyy = Button_(text='Heyyy', font_name='oswald.bold.ttf', opacity=0, pos=_pos)
             add_widget = lambda a, w: self.add_widget(w)
 
             def _on_start1(a, w):
@@ -477,6 +477,9 @@ class TestApp(App):
         app = Viewer()
         return app
 
+    def on_pause(self):
+        return True
+
 Builder.load_string("""
 <ButtonRoot>:
     label: label_id
@@ -524,6 +527,11 @@ Builder.load_string("""
         Rectangle:
             size: self.size
             pos: self.pos
+        Color:
+            rgba: app.black
+        Line:
+            points: root.x, root.y, root.right, root.y
+            width: 1
 
 <MyPopup>:
     opacity: 0.5
@@ -587,6 +595,12 @@ Builder.load_string("""
             width: root.width
             spacing: root.spacing
             widget: widget_id.button
+            canvas.before:
+                Color:
+                    rgba: app.gray
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
 
 <Viewer>:
     name: 'My Screen'
@@ -611,7 +625,7 @@ Builder.load_string("""
         pos_hint: {'top': 0.8873}
         data: root.data
     Label:
-        pos_hint: {'center_x': 0.3, 'y': 0}
+        pos_hint: {'center_x': (1.0/3.0), 'y': 0}
         font_name: 'heydings_icons.ttf'
         font_size: self.height*0.7
         size_hint: 0.0625, 0.086
@@ -619,7 +633,7 @@ Builder.load_string("""
         opacity: 0.5
         text: 'y'
     Label:
-        pos_hint: {'center_x': 0.667, 'y': 0}
+        pos_hint: {'center_x': (2.0/3.0), 'y': 0}
         font_name: 'heydings_icons.ttf'
         font_size: self.height*0.7
         size_hint: 0.0625, 0.086
