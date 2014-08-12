@@ -289,7 +289,8 @@ class MyWidget(Widget):
             
             def _on_complete(a, w):
                 viewer.remove_widget(w)
-                self.state = 'set'
+                if self.state == 'go':
+                    self.state = 'set'
 
             anim = Animation(opacity=0, duration=2.0)
             anim.bind(on_start=_on_start, on_complete=_on_complete)
