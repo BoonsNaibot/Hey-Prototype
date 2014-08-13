@@ -13,8 +13,8 @@ class ButtonRoot(Widget):
     markup = BooleanProperty(False)
     shorten = BooleanProperty(False)
     font_name = StringProperty('Walkway Bold.ttf')
-    state_color = ListProperty([1.0, 1.0, 1.0, 0.0])
-    text_color = ListProperty([1.0, 1.0, 1.0, 1.0])
+    state_color = ListProperty((1.0, 1.0, 1.0, 0.0))
+    text_color = ListProperty((1.0, 1.0, 1.0, 1.0))
 
     def on_state(self, *args):
         pass
@@ -194,11 +194,8 @@ class Deletable(ButtonRoot):
 
             if self.state == 'delete':
                 touch.ungrab(self)
-                sup = super(ButtonRoot, self).on_touch_up(touch)
-
-                if sup:
-                    return sup
-                else:
+                
+                if not super(ButtonRoot, self).on_touch_up(touch):
                     layout = self.layout
                     db = self.delete_button()
 
@@ -208,7 +205,8 @@ class Deletable(ButtonRoot):
                         _anim.start(layout.proxy_ref)
                     else:
                         self.state = 'normal'
-                    return True
+                
+                return True
 
         return super(Deletable, self).on_touch_up(touch)
 
