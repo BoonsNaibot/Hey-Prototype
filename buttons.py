@@ -245,6 +245,8 @@ class Item(Deletable, Clickable):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             return super(Item, self).on_touch_down(touch)
+        elif self.state <> 'normal':
+            self.state = 'normal'
 
 
 Builder.load_string("""
