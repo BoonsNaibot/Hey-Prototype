@@ -166,7 +166,6 @@ class Deletable(ButtonRoot):
             return super(Deletable, self).on_touch_down(touch)
 
     def on_touch_move(self, touch):
-
         if touch.grab_current is self:
             assert(ref(self) in touch.ud)
 
