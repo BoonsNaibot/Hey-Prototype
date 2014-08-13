@@ -5,6 +5,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.effects.dampedscroll import DampedScrollEffect
 from kivy.properties import AliasProperty, ListProperty, NumericProperty, ObjectProperty, OptionProperty
 
+
 class ScrollerEffect(DampedScrollEffect):
     min_velocity = NumericProperty(10)
     _parent = ObjectProperty(None)
@@ -17,10 +18,7 @@ class ScrollerEffect(DampedScrollEffect):
     target_widget = AliasProperty(_get_target_widget, None)
     
     def _get_min(self):
-        if self.target_widget:
-            return -(self.target_widget.size[1] - self._parent.height)
-        else:
-            return 0
+        return -(self.target_widget.size[1] - self._parent.height) if self.target_widget else 0
         
     min = AliasProperty(_get_min, None)
     
@@ -47,8 +45,10 @@ class ScrollerEffect(DampedScrollEffect):
         self.velocity = 0
         self._parent.mode = 'normal'
 
+
 class StencilLayout(FloatLayout):
     pass
+
 
 class Scroller(StencilLayout):
     scroll_distance = NumericProperty('10dp')
@@ -172,6 +172,7 @@ class Scroller(StencilLayout):
         super(Scroller, self).remove_widget(widget)
         if widget is self._viewport():
             self._viewport = lambda : None
+
 
 Builder.load_string("""
 <StencilLayout>:
