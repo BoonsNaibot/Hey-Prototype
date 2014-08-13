@@ -163,6 +163,7 @@ Builder.load_string("""
 
 <SpecialListView>:
     container: container_id
+    selection_mode: 'None'
 
     ActionWidget:
         id: widget_id
