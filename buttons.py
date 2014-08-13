@@ -247,6 +247,7 @@ class Item(Deletable, Clickable):
             return super(Item, self).on_touch_down(touch)
         elif self.state <> 'normal':
             self.state = 'normal'
+            return True
 
 
 Builder.load_string("""
