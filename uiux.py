@@ -149,7 +149,7 @@ class ActionWidget(Widget):
 
 
 Builder.load_string("""
-#:import ActionButton buttons.ActionButton
+#:import ActionsButton buttons.ActionsButton
 
 <SentPopup>:
     opacity: 0.5
@@ -178,7 +178,7 @@ Builder.load_string("""
 
 
 <ActionWidget>:
-    button: HeyButtonid
+    button: button_id
     size_hint: 0.5, 0.5
     pos_hint: {'center_x': 0.5, 'center_y': 0.5}
     canvas:
@@ -187,8 +187,8 @@ Builder.load_string("""
         Rectangle:
             pos: self.pos
             size: self.size
-    ActionButton:
-        id: HeyButtonid
+    ActionsButton:
+        id: button_id
         text: 'Truth'
         size: root.size[0], 0.5*root.size[1]
         pos: root.pos

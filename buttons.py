@@ -2,7 +2,8 @@ from weakref import ref
 from kivy.clock import Clock
 from kivy.lang import Builder
 from kivy.uix.widget import Widget
-from kivy.properties import BooleanProperty, ListProperty, NumericProperty, OptionProperty, StringProperty
+from kivy.animation import Animation
+from kivy.properties import BooleanProperty, ListProperty, NumericProperty, ObjectProperty, OptionProperty, StringProperty
 
 
 class ButtonRoot(Widget):
@@ -116,12 +117,12 @@ class HeyButton(Clickable):
         self.parent.state = 'go'
 
 
-class ActionButton(HeyButton):
+class ActionsButton(HeyButton):
     font_name = StringProperty('oswald.bold.ttf')
 
     def on_touch_down(self, touch):
         if self.text:
-            return super(ActionButton, self).on_touch_down(touch)
+            return super(ActionsButton, self).on_touch_down(touch)
 
     def on_release(self):
         self.parent.state = 'set'
@@ -285,7 +286,7 @@ Builder.load_string("""
     font_size: self.height*0.3
 
 
-<ActionButton>:
+<ActionsButton>:
     font_size: self.height*0.421875
 
 
